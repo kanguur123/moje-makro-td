@@ -1,344 +1,231 @@
--- ============================================================
--- ALLIANCE TOWER DEFENSE - MACRO v5.5
--- RECORD / STOP / PLAY + zapis do pliku
--- ============================================================
-
-local lp = game:GetService("Players").LocalPlayer
-local CoreGui = game:GetService("CoreGui")
-
--- ===== GUI =====
-local old = CoreGui:FindFirstChild("MacroUI")
+local lp=game:GetService("Players").LocalPlayer
+local CG=game:GetService("CoreGui")
+local RS=game:GetService("ReplicatedStorage")
+local SF="makro_td.json"
+game:GetService("StarterGui"):SetCore("SendNotification",{Title="MACRO",Text="Wersja 3.0 zaladowana",Duration=5})
+local old=CG:FindFirstChild("MacroUI")
 if old then old:Destroy() end
-
-local sg = Instance.new("ScreenGui")
-sg.Name = "MacroUI"
-sg.DisplayOrder = 999
-sg.IgnoreGuiInset = true
-sg.ResetOnSpawn = false
-sg.Parent = CoreGui
-
-local main = Instance.new("Frame")
-main.Size = UDim2.new(0, 340, 0, 280)
-main.Position = UDim2.new(1, -360, 0, 60)
-main.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
-main.Parent = sg
-
-local corner = Instance.new("UICorner")
-corner.CornerRadius = UDim.new(0, 8)
-corner.Parent = main
-
-local title = Instance.new("TextLabel")
-title.Size = UDim2.new(1, 0, 0, 28)
-title.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
-title.TextColor3 = Color3.fromRGB(255, 255, 255)
-title.Font = Enum.Font.GothamBold
-title.TextSize = 14
-title.Text = "TD MACRO v5.5"
-title.Parent = main
-
-local statusLabel = Instance.new("TextLabel")
-statusLabel.Size = UDim2.new(1, -20, 0, 20)
-statusLabel.Position = UDim2.new(0, 10, 0, 34)
-statusLabel.BackgroundTransparency = 1
-statusLabel.TextColor3 = Color3.fromRGB(0, 255, 100)
-statusLabel.Font = Enum.Font.Code
-statusLabel.TextSize = 12
-statusLabel.TextXAlignment = Enum.TextXAlignment.Left
-statusLabel.Text = "Status: Idle"
-statusLabel.Parent = main
-
-local infoLabel = Instance.new("TextLabel")
-infoLabel.Size = UDim2.new(1, -20, 0, 20)
-infoLabel.Position = UDim2.new(0, 10, 0, 56)
-infoLabel.BackgroundTransparency = 1
-infoLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
-infoLabel.Font = Enum.Font.Code
-infoLabel.TextSize = 11
-infoLabel.TextXAlignment = Enum.TextXAlignment.Left
-infoLabel.Text = "Akcje: 0"
-infoLabel.Parent = main
-
-local btnContainer = Instance.new("Frame")
-btnContainer.Size = UDim2.new(1, -20, 0, 40)
-btnContainer.Position = UDim2.new(0, 10, 0, 82)
-btnContainer.BackgroundTransparency = 1
-btnContainer.Parent = main
-
-local btnLayout = Instance.new("UIListLayout")
-btnLayout.FillDirection = Enum.FillDirection.Horizontal
-btnLayout.Padding = UDim.new(0, 8)
-btnLayout.Parent = btnContainer
-
-local logFrame = Instance.new("ScrollingFrame")
-logFrame.Size = UDim2.new(1, -20, 0, 130)
-logFrame.Position = UDim2.new(0, 10, 0, 130)
-logFrame.BackgroundColor3 = Color3.fromRGB(10, 10, 15)
-logFrame.AutomaticCanvasSize = Enum.AutomaticSize.Y
-logFrame.ScrollBarThickness = 4
-logFrame.Parent = main
-
-local logLayout = Instance.new("UIListLayout")
-logLayout.Parent = logFrame
-
-local function log(s, color)
-    local t = Instance.new("TextLabel")
-    t.Size = UDim2.new(1, -6, 0, 14)
-    t.BackgroundTransparency = 1
-    t.TextColor3 = color or Color3.fromRGB(150, 255, 150)
-    t.TextXAlignment = Enum.TextXAlignment.Left
-    t.Font = Enum.Font.Code
-    t.TextSize = 10
-    t.Text = s
-    t.Parent = logFrame
+local sg=Instance.new("ScreenGui")
+sg.Name="MacroUI"
+sg.DisplayOrder=999
+sg.IgnoreGuiInset=true
+sg.ResetOnSpawn=false
+sg.Parent=CG
+local main=Instance.new("Frame")
+main.Size=UDim2.new(0,340,0,280)
+main.Position=UDim2.new(1,-360,0,60)
+main.BackgroundColor3=Color3.fromRGB(20,20,25)
+main.Parent=sg
+local cr=Instance.new("UICorner")
+cr.CornerRadius=UDim.new(0,8)
+cr.Parent=main
+local ti=Instance.new("TextLabel")
+ti.Size=UDim2.new(1,0,0,28)
+ti.BackgroundColor3=Color3.fromRGB(30,30,40)
+ti.TextColor3=Color3.fromRGB(255,255,255)
+ti.Font=Enum.Font.GothamBold
+ti.TextSize=14
+ti.Text="TD MACRO v3.0"
+ti.Parent=main
+local sl=Instance.new("TextLabel")
+sl.Size=UDim2.new(1,-20,0,20)
+sl.Position=UDim2.new(0,10,0,34)
+sl.BackgroundTransparency=1
+sl.TextColor3=Color3.fromRGB(0,255,100)
+sl.Font=Enum.Font.Code
+sl.TextSize=12
+sl.TextXAlignment=Enum.TextXAlignment.Left
+sl.Text="Idle"
+sl.Parent=main
+local il=Instance.new("TextLabel")
+il.Size=UDim2.new(1,-20,0,20)
+il.Position=UDim2.new(0,10,0,56)
+il.BackgroundTransparency=1
+il.TextColor3=Color3.fromRGB(200,200,200)
+il.Font=Enum.Font.Code
+il.TextSize=11
+il.TextXAlignment=Enum.TextXAlignment.Left
+il.Text="Akcje: 0"
+il.Parent=main
+local bc=Instance.new("Frame")
+bc.Size=UDim2.new(1,-20,0,40)
+bc.Position=UDim2.new(0,10,0,82)
+bc.BackgroundTransparency=1
+bc.Parent=main
+local bl=Instance.new("UIListLayout")
+bl.FillDirection=Enum.FillDirection.Horizontal
+bl.Padding=UDim.new(0,8)
+bl.Parent=bc
+local lf=Instance.new("ScrollingFrame")
+lf.Size=UDim2.new(1,-20,0,130)
+lf.Position=UDim2.new(0,10,0,130)
+lf.BackgroundColor3=Color3.fromRGB(10,10,15)
+lf.AutomaticCanvasSize=Enum.AutomaticSize.Y
+lf.ScrollBarThickness=4
+lf.Parent=main
+local ll=Instance.new("UIListLayout")
+ll.Parent=lf
+local function log(s,c)
+local t=Instance.new("TextLabel")
+t.Size=UDim2.new(1,-6,0,14)
+t.BackgroundTransparency=1
+t.TextColor3=c or Color3.fromRGB(150,255,150)
+t.TextXAlignment=Enum.TextXAlignment.Left
+t.Font=Enum.Font.Code
+t.TextSize=10
+t.Text=s
+t.Parent=lf
 end
-
--- ===== STAN =====
-local SAVE_FILE = "makro_td.json"
-local state = {
-    mode = "idle",
-    actions = {},
-    recordStart = 0,
-}
-
-local function getCash()
-    local c = lp.leaderstats and lp.leaderstats:FindFirstChild("Cash")
-    return c and c.Value or 0
+local st={mode="idle",actions={},t0=0}
+local function gc()
+local x=lp.leaderstats and lp.leaderstats:FindFirstChild("Cash")
+return x and x.Value or 0
 end
-
-local function updateStatus()
-    if state.mode == "recording" then
-        statusLabel.Text = "Status: NAGRYWANIE..."
-        statusLabel.TextColor3 = Color3.fromRGB(255, 80, 80)
-    elseif state.mode == "playing" then
-        statusLabel.Text = "Status: ODTWARZANIE..."
-        statusLabel.TextColor3 = Color3.fromRGB(80, 200, 255)
-    else
-        statusLabel.Text = "Status: Idle"
-        statusLabel.TextColor3 = Color3.fromRGB(0, 255, 100)
-    end
-    infoLabel.Text = "Akcje: " .. #state.actions .. "  |  Kasa: " .. getCash()
+local function us()
+if st.mode=="recording" then sl.Text="REC..." sl.TextColor3=Color3.fromRGB(255,80,80)
+elseif st.mode=="playing" then sl.Text="PLAY..." sl.TextColor3=Color3.fromRGB(80,200,255)
+else sl.Text="Idle" sl.TextColor3=Color3.fromRGB(0,255,100) end
+il.Text="Akcje: "..#st.actions.." | $"..gc()
 end
-
--- LENIWE POBIERANIE REMOTOW
-local _Place = nil
-local function getPlace()
-    if _Place then return _Place end
-    local RS = game:GetService("ReplicatedStorage")
-    local RF = RS:FindFirstChild("RemoteFunctions")
-    if not RF then
-        log("BLAD: brak RemoteFunctions", Color3.fromRGB(255, 100, 100))
-        return nil
-    end
-    local p = RF:FindFirstChild("PlaceTower")
-    if not p then
-        log("BLAD: brak PlaceTower", Color3.fromRGB(255, 100, 100))
-        return nil
-    end
-    _Place = p
-    log("PlaceTower znalezione", Color3.fromRGB(0, 255, 100))
-    return _Place
+local _P=nil
+local function gp()
+if _P then return _P end
+local RF=RS:FindFirstChild("RemoteFunctions")
+if not RF then log("brak RF",Color3.fromRGB(255,100,100)) return nil end
+local p=RF:FindFirstChild("PlaceTower")
+if not p then log("brak PlaceTower",Color3.fromRGB(255,100,100)) return nil end
+_P=p
+return p
 end
-
--- ZAPIS
-local function saveToFile()
-    local ok, err = pcall(function()
-        local lines = {}
-        table.insert(lines, "{")
-        table.insert(lines, '  "version": 1,')
-        table.insert(lines, '  "actions": [')
-        for i, a in ipairs(state.actions) do
-            local parts = {}
-            for k, v in pairs(a) do
-                if type(v) == "string" then
-                    table.insert(parts, '"' .. k .. '":"' .. v .. '"')
-                else
-                    table.insert(parts, '"' .. k .. '":' .. tostring(v))
-                end
-            end
-            local comma = (i < #state.actions) and "," or ""
-            table.insert(lines, '    {' .. table.concat(parts, ",") .. '}' .. comma)
-        end
-        table.insert(lines, '  ]')
-        table.insert(lines, '}')
-        writefile(SAVE_FILE, table.concat(lines, "\n"))
-    end)
-    if ok then
-        log("Zapisano " .. #state.actions .. " akcji", Color3.fromRGB(0, 255, 100))
-    else
-        log("BLAD zapisu: " .. tostring(err), Color3.fromRGB(255, 100, 100))
-    end
+local function save()
+local ok,err=pcall(function()
+local l={"{",'  "actions": ['}
+for i,a in ipairs(st.actions) do
+local p={}
+for k,v in pairs(a) do
+if type(v)=="string" then table.insert(p,'"'..k..'":"'..v..'"')
+else table.insert(p,'"'..k..'":'..tostring(v)) end
 end
-
-local function loadFromFile()
-    if not isfile(SAVE_FILE) then
-        log("Brak pliku " .. SAVE_FILE, Color3.fromRGB(255, 200, 0))
-        return false
-    end
-    local ok, content = pcall(function() return readfile(SAVE_FILE) end)
-    if not ok then
-        log("BLAD readfile: " .. tostring(content), Color3.fromRGB(255, 100, 100))
-        return false
-    end
-    state.actions = {}
-    for line in content:gmatch("[^\n]+") do
-        local t = line:match('"t":([%d%.]+)')
-        local typ = line:match('"type":"([^"]+)"')
-        local unit = line:match('"unit":"([^"]+)"')
-        local x = line:match('"x":(%-?[%d%.]+)')
-        local y = line:match('"y":(%-?[%d%.]+)')
-        local z = line:match('"z":(%-?[%d%.]+)')
-        if t and typ then
-            local action = {t = tonumber(t), type = typ}
-            if unit then action.unit = unit end
-            if x and y and z then
-                action.x = tonumber(x); action.y = tonumber(y); action.z = tonumber(z)
-            end
-            table.insert(state.actions, action)
-        end
-    end
-    log("Wczytano " .. #state.actions .. " akcji", Color3.fromRGB(0, 255, 100))
-    return true
+local cm=(i<#st.actions) and "," or ""
+table.insert(l,'    {'..table.concat(p,",")..'}'..cm)
 end
-
--- HOOK
-local recordingHook = false
-local function startRecordingHook()
-    if recordingHook then return end
-    recordingHook = true
-    local oldNamecall
-    oldNamecall = hookmetamethod(game, "__namecall", function(self, ...)
-        local method = getnamecallmethod()
-        if state.mode == "recording" and typeof(self) == "Instance" and self.Name == "PlaceTower" then
-            if method == "InvokeServer" or method == "FireServer" then
-                local args = {...}
-                local unit = args[1]
-                local cf = args[2]
-                local t = tick() - state.recordStart
-                if typeof(cf) == "CFrame" then
-                    table.insert(state.actions, {
-                        t = tonumber(string.format("%.2f", t)),
-                        type = "PlaceTower",
-                        unit = tostring(unit),
-                        x = tonumber(string.format("%.2f", cf.Position.X)),
-                        y = tonumber(string.format("%.2f", cf.Position.Y)),
-                        z = tonumber(string.format("%.2f", cf.Position.Z)),
-                    })
-                    log(string.format("[REC] %.2fs %s", t, tostring(unit)), Color3.fromRGB(255, 100, 100))
-                    updateStatus()
-                end
-            end
-        end
-        return oldNamecall(self, ...)
-    end)
-end
-
-local function playActions()
-    if #state.actions == 0 then
-        log("Brak akcji!", Color3.fromRGB(255, 200, 0))
-        return
-    end
-    local Place = getPlace()
-    if not Place then
-        log("Nie moge odtworzyc - brak PlaceTower", Color3.fromRGB(255, 100, 100))
-        return
-    end
-    state.mode = "playing"
-    updateStatus()
-    task.spawn(function()
-        local startT = tick()
-        for i, a in ipairs(state.actions) do
-            if state.mode ~= "playing" then return end
-            local targetTime = startT + a.t
-            local waitTime = targetTime - tick()
-            if waitTime > 0 then task.wait(waitTime) end
-            if a.type == "PlaceTower" then
-                local placed = false
-                local attempts = 0
-                while not placed and attempts < 20 do
-                    if state.mode ~= "playing" then return end
-                    local cashBefore = getCash()
-                    if cashBefore < 100 then
-                        task.wait(1)
-                        attempts = attempts + 1
-                    else
-                        pcall(function()
-                            Place:InvokeServer(a.unit, CFrame.new(a.x, a.y, a.z))
-                        end)
-                        task.wait(0.3)
-                        if getCash() < cashBefore then
-                            placed = true
-                            log(string.format("[%d/%d] OK", i, #state.actions), Color3.fromRGB(0, 255, 100))
-                        else
-                            attempts = attempts + 1
-                            task.wait(0.8)
-                        end
-                    end
-                end
-                if not placed then
-                    log(string.format("[%d/%d] FAIL", i, #state.actions), Color3.fromRGB(255, 100, 100))
-                end
-            end
-            updateStatus()
-        end
-        log("=== KONIEC ===", Color3.fromRGB(0, 255, 100))
-        state.mode = "idle"
-        updateStatus()
-    end)
-end
-
--- PRZYCISKI
-local function makeButton(text, color, callback)
-    local btn = Instance.new("TextButton")
-    btn.Size = UDim2.new(0, 100, 1, 0)
-    btn.BackgroundColor3 = color
-    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-    btn.Font = Enum.Font.GothamBold
-    btn.TextSize = 13
-    btn.Text = text
-    btn.Parent = btnContainer
-    local c = Instance.new("UICorner")
-    c.CornerRadius = UDim.new(0, 6)
-    c.Parent = btn
-    btn.MouseButton1Click:Connect(callback)
-    return btn
-end
-
-makeButton("RECORD", Color3.fromRGB(200, 60, 60), function()
-    if state.mode ~= "idle" then return end
-    state.actions = {}
-    state.recordStart = tick()
-    state.mode = "recording"
-    startRecordingHook()
-    log("=== REC START ===", Color3.fromRGB(255, 100, 100))
-    updateStatus()
+table.insert(l,"  ]\n}")
+writefile(SF,table.concat(l,"\n"))
 end)
-
-makeButton("STOP", Color3.fromRGB(200, 150, 60), function()
-    if state.mode == "recording" then
-        state.mode = "idle"
-        log("=== REC STOP ===", Color3.fromRGB(255, 200, 0))
-        saveToFile()
-    elseif state.mode == "playing" then
-        state.mode = "idle"
-        log("=== PLAY STOP ===", Color3.fromRGB(255, 200, 0))
-    end
-    updateStatus()
+if ok then log("Zapisano "..#st.actions,Color3.fromRGB(0,255,100))
+else log("BLAD: "..tostring(err),Color3.fromRGB(255,100,100)) end
+end
+local function load()
+if not isfile(SF) then log("brak pliku",Color3.fromRGB(255,200,0)) return end
+local ok,c=pcall(function() return readfile(SF) end)
+if not ok then log("BLAD read",Color3.fromRGB(255,100,100)) return end
+st.actions={}
+for line in c:gmatch("[^\n]+") do
+local t=line:match('"t":([%d%.]+)')
+local ty=line:match('"type":"([^"]+)"')
+local u=line:match('"unit":"([^"]+)"')
+local x=line:match('"x":(%-?[%d%.]+)')
+local y=line:match('"y":(%-?[%d%.]+)')
+local z=line:match('"z":(%-?[%d%.]+)')
+if t and ty then
+local a={t=tonumber(t),type=ty}
+if u then a.unit=u end
+if x and y and z then a.x=tonumber(x) a.y=tonumber(y) a.z=tonumber(z) end
+table.insert(st.actions,a)
+end
+end
+log("Wczytano "..#st.actions,Color3.fromRGB(0,255,100))
+end
+local hooked=false
+local function sh()
+if hooked then return end
+hooked=true
+local o
+o=hookmetamethod(game,"__namecall",function(s,...)
+local m=getnamecallmethod()
+if st.mode=="recording" and typeof(s)=="Instance" and s.Name=="PlaceTower" and (m=="InvokeServer" or m=="FireServer") then
+local a={...}
+local u=a[1]
+local cf=a[2]
+local t=tick()-st.t0
+if typeof(cf)=="CFrame" then
+table.insert(st.actions,{t=tonumber(string.format("%.2f",t)),type="PlaceTower",unit=tostring(u),x=tonumber(string.format("%.2f",cf.Position.X)),y=tonumber(string.format("%.2f",cf.Position.Y)),z=tonumber(string.format("%.2f",cf.Position.Z))})
+log(string.format("[REC] %.2fs %s",t,tostring(u)),Color3.fromRGB(255,100,100))
+us()
+end
+end
+return o(s,...)
 end)
-
-makeButton("PLAY", Color3.fromRGB(60, 150, 60), function()
-    if state.mode ~= "idle" then return end
-    if #state.actions == 0 then
-        loadFromFile()
-    end
-    if #state.actions == 0 then
-        log("Brak nagrania!", Color3.fromRGB(255, 200, 0))
-        return
-    end
-    playActions()
+end
+local function play()
+if #st.actions==0 then log("brak akcji!",Color3.fromRGB(255,200,0)) return end
+local P=gp()
+if not P then return end
+st.mode="playing"
+us()
+task.spawn(function()
+local st0=tick()
+for i,a in ipairs(st.actions) do
+if st.mode~="playing" then return end
+local wt=st0+a.t-tick()
+if wt>0 then task.wait(wt) end
+if a.type=="PlaceTower" then
+local done=false
+local at=0
+while not done and at<20 do
+if st.mode~="playing" then return end
+local cb=gc()
+if cb<100 then task.wait(1) at=at+1
+else
+pcall(function() P:InvokeServer(a.unit,CFrame.new(a.x,a.y,a.z)) end)
+task.wait(0.3)
+if gc()<cb then done=true log(string.format("[%d/%d] OK",i,#st.actions),Color3.fromRGB(0,255,100))
+else at=at+1 task.wait(0.8) end
+end
+end
+if not done then log(string.format("[%d/%d] FAIL",i,#st.actions),Color3.fromRGB(255,100,100)) end
+end
+us()
+end
+log("=== KONIEC ===",Color3.fromRGB(0,255,100))
+st.mode="idle"
+us()
 end)
-
--- Start
-log("=== TD MACRO v5.5 ===", Color3.fromRGB(0, 255, 255))
-log("Kliknij RECORD aby nagrac", Color3.fromRGB(200, 200, 200))
-log("Plik: " .. SAVE_FILE .. " (" .. (isfile(SAVE_FILE) and "ISTNIEJE" or "brak") .. ")", Color3.fromRGB(200, 200, 200))
-updateStatus()
+end
+local function mb(txt,col,cb)
+local b=Instance.new("TextButton")
+b.Size=UDim2.new(0,100,1,0)
+b.BackgroundColor3=col
+b.TextColor3=Color3.fromRGB(255,255,255)
+b.Font=Enum.Font.GothamBold
+b.TextSize=13
+b.Text=txt
+b.Parent=bc
+local cc=Instance.new("UICorner")
+cc.CornerRadius=UDim.new(0,6)
+cc.Parent=b
+b.MouseButton1Click:Connect(cb)
+end
+mb("RECORD",Color3.fromRGB(200,60,60),function()
+if st.mode~="idle" then return end
+st.actions={}
+st.t0=tick()
+st.mode="recording"
+sh()
+log("=== REC ===",Color3.fromRGB(255,100,100))
+us()
+end)
+mb("STOP",Color3.fromRGB(200,150,60),function()
+if st.mode=="recording" then st.mode="idle" log("=== STOP ===",Color3.fromRGB(255,200,0)) save()
+elseif st.mode=="playing" then st.mode="idle" log("=== STOP ===",Color3.fromRGB(255,200,0)) end
+us()
+end)
+mb("PLAY",Color3.fromRGB(60,150,60),function()
+if st.mode~="idle" then return end
+if #st.actions==0 then load() end
+if #st.actions==0 then log("brak nagrania!",Color3.fromRGB(255,200,0)) return end
+play()
+end)
+log("=== TD MACRO v3.0 ===",Color3.fromRGB(0,255,255))
+log("Plik: "..(isfile(SF) and "JEST" or "brak"),Color3.fromRGB(200,200,200))
+us()
