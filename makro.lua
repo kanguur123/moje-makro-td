@@ -2,7 +2,7 @@ local lp=game:GetService("Players").LocalPlayer
 local CG=game:GetService("CoreGui")
 local RS=game:GetService("ReplicatedStorage")
 local SF="makro_td.json"
-game:GetService("StarterGui"):SetCore("SendNotification",{Title="MACRO",Text="Wersja 3.0 zaladowana",Duration=5})
+game:GetService("StarterGui"):SetCore("SendNotification",{Title="MACRO",Text="Wersja 3.1 - REC dziala",Duration=5})
 local old=CG:FindFirstChild("MacroUI")
 if old then old:Destroy() end
 local sg=Instance.new("ScreenGui")
@@ -25,7 +25,7 @@ ti.BackgroundColor3=Color3.fromRGB(30,30,40)
 ti.TextColor3=Color3.fromRGB(255,255,255)
 ti.Font=Enum.Font.GothamBold
 ti.TextSize=14
-ti.Text="TD MACRO v3.0"
+ti.Text="TD MACRO v3.1"
 ti.Parent=main
 local sl=Instance.new("TextLabel")
 sl.Size=UDim2.new(1,-20,0,20)
@@ -140,8 +140,8 @@ local hooked=false
 local function sh()
 if hooked then return end
 hooked=true
-local o
-o=hookmetamethod(game,"__namecall",function(s,...)
+local orig
+orig=hookmetamethod(game,"__namecall",function(s,...)
 local m=getnamecallmethod()
 if st.mode=="recording" and typeof(s)=="Instance" and s.Name=="PlaceTower" and (m=="InvokeServer" or m=="FireServer") then
 local a={...}
@@ -154,7 +154,7 @@ log(string.format("[REC] %.2fs %s",t,tostring(u)),Color3.fromRGB(255,100,100))
 us()
 end
 end
-return o(s,...)
+return orig(s,...)
 end)
 end
 local function play()
@@ -226,6 +226,6 @@ if #st.actions==0 then load() end
 if #st.actions==0 then log("brak nagrania!",Color3.fromRGB(255,200,0)) return end
 play()
 end)
-log("=== TD MACRO v3.0 ===",Color3.fromRGB(0,255,255))
+log("=== TD MACRO v3.1 ===",Color3.fromRGB(0,255,255))
 log("Plik: "..(isfile(SF) and "JEST" or "brak"),Color3.fromRGB(200,200,200))
 us()
