@@ -95,7 +95,6 @@ end
 local function onNewTower(tower)
 if st.mode~="recording" then return end
 task.spawn(function()
--- czekaj na HumanoidRootPart
 local root
 for i=1,20 do
 root=tower:FindFirstChild("HumanoidRootPart")
@@ -106,7 +105,6 @@ if not root then
 log("["..tower.Name.."] brak Root",Color3.fromRGB(255,150,0))
 return
 end
--- dodatkowe 0.1s zeby pozycja byla stabilna
 task.wait(0.1)
 local p=root.Position
 local key=string.format("%.1f_%.1f_%.1f",p.X,p.Y,p.Z)
