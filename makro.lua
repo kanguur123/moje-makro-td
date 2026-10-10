@@ -24,7 +24,7 @@ ti.BackgroundColor3=Color3.fromRGB(30,30,40)
 ti.TextColor3=Color3.fromRGB(255,255,255)
 ti.Font=Enum.Font.GothamBold
 ti.TextSize=14
-ti.Text="TD MACRO v8.0"
+ti.Text="TD MACRO v8.1"
 ti.Parent=main
 local sl=Instance.new("TextLabel")
 sl.Size=UDim2.new(1,-20,0,20)
@@ -94,16 +94,31 @@ return string.format("%.1f_%.1f_%.1f",p.X,p.Y,p.Z),t.Name,p
 end
 local function onNewTower(tower)
 if st.mode~="recording" then return end
-local key,name,pos=towerKey(tower)
-if not key then return end
+task.spawn(function()
+-- czekaj na HumanoidRootPart
+local root
+for i=1,20 do
+root=tower:FindFirstChild("HumanoidRootPart")
+if root then break end
+task.wait(0.05)
+end
+if not root then
+log("["..tower.Name.."] brak Root",Color3.fromRGB(255,150,0))
+return
+end
+-- dodatkowe 0.1s zeby pozycja byla stabilna
+task.wait(0.1)
+local p=root.Position
+local key=string.format("%.1f_%.1f_%.1f",p.X,p.Y,p.Z)
 if st.known[key] then return end
 st.known[key]=true
 local now=tick()-st.t0
 if now-st.lastT<0.05 then now=st.lastT+0.05 end
 st.lastT=now
-table.insert(st.actions,{t=tonumber(string.format("%.2f",now)),type="PlaceTower",unit=name,x=tonumber(string.format("%.2f",pos.X)),y=tonumber(string.format("%.2f",pos.Y)),z=tonumber(string.format("%.2f",pos.Z))})
-log(string.format("[REC] %.2fs %s",now,name),Color3.fromRGB(255,100,100))
+table.insert(st.actions,{t=tonumber(string.format("%.2f",now)),type="PlaceTower",unit=tower.Name,x=tonumber(string.format("%.2f",p.X)),y=tonumber(string.format("%.2f",p.Y)),z=tonumber(string.format("%.2f",p.Z))})
+log(string.format("[REC] %.2fs %s @ %.1f,%.1f,%.1f",now,tower.Name,p.X,p.Y,p.Z),Color3.fromRGB(255,100,100))
 us()
+end)
 end
 local function startRec()
 st.known={}
@@ -241,6 +256,6 @@ if #st.actions==0 then load() end
 if #st.actions==0 then log("brak nagrania!",Color3.fromRGB(255,200,0)) return end
 play()
 end)
-log("=== TD MACRO v8.0 ===",Color3.fromRGB(0,255,255))
+log("=== TD MACRO v8.1 ===",Color3.fromRGB(0,255,255))
 log("Plik: "..(isfile(SF) and "JEST" or "brak"),Color3.fromRGB(200,200,200))
 us()
